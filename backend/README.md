@@ -10,6 +10,9 @@ https://github.com/Swap1019/ChatApp-BackEnd
 The Django version served as a prototype to validate core features and architecture decisions.  
 This .NET implementation is a complete rewrite focused on scalability, performance, and production readiness.
 
+🔗 Database Schema:
+https://dbdiagram.io/d/ChatAppDbDesignDotnet-69d77ff70f7c9ef2c0b79147
+
 
 ## 🌟 Key Features
 
