@@ -1,0 +1,190 @@
+{
+  "permissions": [
+    {
+      "codename": "manage.users.view",
+      "name": "View Users",
+      "description": "View all users and their details"
+    },
+    {
+      "codename": "manage.users.suspend",
+      "name": "Suspend Users",
+      "description": "Suspend or unsuspend user accounts"
+    },
+    {
+      "codename": "manage.users.ban",
+      "name": "Ban Users",
+      "description": "Ban users from the platform"
+    },
+    {
+      "codename": "manage.users.delete",
+      "name": "Delete Users",
+      "description": "Delete user accounts and associated data"
+    },
+    {
+      "codename": "manage.users.edit",
+      "name": "Edit Users",
+      "description": "Edit user profiles and settings"
+    },
+    {
+      "codename": "manage.conversations.view",
+      "name": "View Conversations",
+      "description": "View all conversations"
+    },
+    {
+      "codename": "manage.conversations.delete",
+      "name": "Delete Conversations",
+      "description": "Delete user conversations"
+    },
+    {
+      "codename": "manage.conversations.moderate",
+      "name": "Moderate Conversations",
+      "description": "Moderate conversation content"
+    },
+    {
+      "codename": "manage.conversations.archive",
+      "name": "Archive Conversations",
+      "description": "Archive conversations"
+    },
+    {
+      "codename": "moderate.content.view",
+      "name": "View Reported Content",
+      "description": "View flagged or reported content"
+    },
+    {
+      "codename": "moderate.content.review",
+      "name": "Review Content",
+      "description": "Review and approve/reject flagged content"
+    },
+    {
+      "codename": "moderate.messages.delete",
+      "name": "Delete Messages",
+      "description": "Delete messages from conversations"
+    },
+    {
+      "codename": "moderate.posts.approve",
+      "name": "Approve Posts",
+      "description": "Approve or reject user posts"
+    },
+    {
+      "codename": "manage.roles.view",
+      "name": "View Roles",
+      "description": "View all roles and permissions"
+    },
+    {
+      "codename": "manage.roles.create",
+      "name": "Create Roles",
+      "description": "Create new roles"
+    },
+    {
+      "codename": "manage.roles.edit",
+      "name": "Edit Roles",
+      "description": "Edit existing roles"
+    },
+    {
+      "codename": "manage.roles.delete",
+      "name": "Delete Roles",
+      "description": "Delete roles"
+    },
+    {
+      "codename": "manage.roles.assign",
+      "name": "Assign Roles",
+      "description": "Assign roles to users"
+    },
+    {
+      "codename": "manage.permissions.edit",
+      "name": "Edit Permissions",
+      "description": "Edit permission definitions"
+    },
+    {
+      "codename": "manage.system.view",
+      "name": "View System",
+      "description": "Access system administration panel"
+    },
+    {
+      "codename": "manage.system.settings",
+      "name": "Manage Settings",
+      "description": "Modify system settings and configuration"
+    },
+    {
+      "codename": "manage.system.logs",
+      "name": "View Logs",
+      "description": "View system logs and audit trail"
+    },
+    {
+      "codename": "view.analytics",
+      "name": "View Analytics",
+      "description": "Access analytics and statistics"
+    },
+    {
+      "codename": "view.reports",
+      "name": "View Reports",
+      "description": "Access user reports and complaint logs"
+    },
+    {
+      "codename": "manage.security.keys",
+      "name": "Manage API Keys",
+      "description": "Create and revoke API keys"
+    },
+    {
+      "codename": "manage.security.audit",
+      "name": "Audit Access",
+      "description": "View security audit logs"
+    }
+  ],
+  "roles": [
+    {
+      "name": "Administrator",
+      "description": "System administrator with full access to all features",
+      "isSystemRole": true,
+      "permissions": [
+        "manage.users.view",
+        "manage.users.suspend",
+        "manage.users.ban",
+        "manage.users.delete",
+        "manage.users.edit",
+        "manage.conversations.view",
+        "manage.conversations.delete",
+        "manage.conversations.moderate",
+        "manage.conversations.archive",
+        "moderate.content.view",
+        "moderate.content.review",
+        "moderate.messages.delete",
+        "moderate.posts.approve",
+        "manage.roles.view",
+        "manage.roles.create",
+        "manage.roles.edit",
+        "manage.roles.delete",
+        "manage.roles.assign",
+        "manage.permissions.edit",
+        "manage.system.view",
+        "manage.system.settings",
+        "manage.system.logs",
+        "view.analytics",
+        "view.reports",
+        "manage.security.keys",
+        "manage.security.audit"
+      ]
+    },
+    {
+      "name": "Moderator",
+      "description": "Content moderator with permissions to review and moderate user content",
+      "isSystemRole": true,
+      "permissions": [
+        "manage.conversations.view",
+        "manage.conversations.moderate",
+        "moderate.content.view",
+        "moderate.content.review",
+        "moderate.messages.delete",
+        "moderate.posts.approve",
+        "manage.roles.view",
+        "view.reports"
+      ]
+    },
+    {
+      "name": "User",
+      "description": "Standard user role with basic permissions",
+      "isSystemRole": true,
+      "permissions": []
+    }
+  ]
+}
