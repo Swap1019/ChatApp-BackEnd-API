@@ -4,8 +4,9 @@ namespace ChatApp.Domain.Entities
     {
         public Guid Id { get; set; }
 
-        // Foreign key to ConversationUser
-        public Guid ConversationUserId { get; set; }
+        // Composite foreign key to ConversationUser
+        public Guid ConversationId { get; set; }
+        public Guid UserId { get; set; }
         public ConversationUser ConversationUser { get; set; } = null!;
 
         // Admin permissions

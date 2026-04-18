@@ -177,7 +177,7 @@ namespace ChatApp.Infrastructure.Persistence
             {
                 entity.HasOne(cua => cua.ConversationUser)
                     .WithMany(cu => cu.AdminPermissions)
-                    .HasForeignKey(cua => cua.ConversationUserId)
+                    .HasForeignKey(cua => new { cua.ConversationId, cua.UserId })
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
