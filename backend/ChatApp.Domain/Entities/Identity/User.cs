@@ -71,15 +71,15 @@ namespace ChatApp.Domain.Entities
         public ICollection<BlockedUser> BlockedUsers { get; set; } = new List<BlockedUser>();
         // Inverse navigation property for users who have blocked this user
         public ICollection<BlockedUser> BlockedByUsers { get; set; } = new List<BlockedUser>();
-        public User(string username, string phonenumber, string email, string passwordHash)
+        public User(string username, string phoneNumber, string email, string passwordHash)
         {
             Id = Guid.NewGuid();
 
             if (string.IsNullOrWhiteSpace(username))
                 throw new ArgumentException("Username is required.", nameof(username));
 
-            if (string.IsNullOrWhiteSpace(phonenumber))
-                throw new ArgumentException("Phone number is required.", nameof(phonenumber));
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+                throw new ArgumentException("Phone number is required.", nameof(phoneNumber));
 
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException("Email is required.", nameof(email));
@@ -91,7 +91,7 @@ namespace ChatApp.Domain.Entities
                 throw new ArgumentException("Password hash is required.", nameof(passwordHash));
 
             Username = username;
-            PhoneNumber = phonenumber;
+            PhoneNumber = phoneNumber;
             Email = email;
             PasswordHash = passwordHash;
         }

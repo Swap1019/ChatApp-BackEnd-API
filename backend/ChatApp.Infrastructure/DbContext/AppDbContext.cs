@@ -392,6 +392,16 @@ namespace ChatApp.Infrastructure.Persistence
 
                 entity.HasIndex(m => m.UploadedByUserId);
 
+                // Configure MediaMetadata as owned value object
+                entity.OwnsOne(m => m.Metadata, metadata =>
+                {
+                    metadata.Property(md => md.Width);
+                    metadata.Property(md => md.Height);
+                    metadata.Property(md => md.Duration);
+                    metadata.Property(md => md.ThumbnailUrl);
+                    metadata.Property(md => md.OriginalFileName);
+                });
+
                 entity.HasMany(m => m.PostAttachments)
                     .WithOne(pa => pa.Media)
                     .HasForeignKey(pa => pa.MediaId);
