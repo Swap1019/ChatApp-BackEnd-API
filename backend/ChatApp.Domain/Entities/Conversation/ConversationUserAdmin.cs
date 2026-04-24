@@ -15,6 +15,7 @@ namespace ChatApp.Domain.Entities
         public bool CanDeleteMessages { get; set; } = false;
         public bool CanUpdateConversation { get; set; } = false;
         public bool CanManageRoles { get; set; } = false;
+        public bool CanManageCalls { get; set; } = false;
 
         public DateTime GrantedAt { get; set; } = DateTime.UtcNow;
     }

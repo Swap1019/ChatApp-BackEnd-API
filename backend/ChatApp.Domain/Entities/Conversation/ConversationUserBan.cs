@@ -14,6 +14,15 @@ namespace ChatApp.Domain.Entities
 
         public DateTime BannedAt { get; set; } = DateTime.UtcNow;
         public string? Reason { get; set; }
-        public DateTime? ExpiresAt { get; set; } // optional expiration for temporary bans
+        public DateTime? ExpiresAt { get; set; } // null = permanent ban, otherwise temporary
+
+        // Helper property to check if ban is currently active
+        public bool IsActive => ExpiresAt == null || ExpiresAt > DateTime.UtcNow;
+
+        // For tracking if ban has been revoked (soft delete pattern)
+        public bool IsRevoked { get; set; } = false;
+        public DateTime? RevokedAt { get; set; }
+        public Guid? RevokedByUserId { get; set; }
+        public User? RevokedByUser { get; set; }
     }
 }

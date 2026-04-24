@@ -186,8 +186,16 @@ namespace ChatApp.Infrastructure.Persistence
             {
                 entity.HasKey(b => new { b.ConversationId, b.UserId });
 
+                // Query filter to exclude revoked bans from default queries
+                entity.HasQueryFilter(b => !b.IsRevoked);
+
+                // Performance indexes
                 entity.HasIndex(b => b.UserId);
                 entity.HasIndex(b => b.BannedByUserId);
+                entity.HasIndex(b => b.RevokedByUserId);
+                entity.HasIndex(b => b.BannedAt);
+                entity.HasIndex(b => new { b.ConversationId, b.ExpiresAt });
+                entity.HasIndex(b => b.IsRevoked);
 
                 entity.HasOne(b => b.Conversation)
                     .WithMany(c => c.BannedUsers)
@@ -204,8 +212,13 @@ namespace ChatApp.Infrastructure.Persistence
                     .HasForeignKey(b => b.BannedByUserId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.Property(b => b.BannedAt)
-                    .IsRequired();
+                entity.HasOne(b => b.RevokedByUser)
+                    .WithMany()
+                    .HasForeignKey(b => b.RevokedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(b => b.BannedAt).IsRequired();
+                entity.Property(b => b.Reason).HasMaxLength(500);
             });
 
             // ===================== CONVERSATION URL =====================
