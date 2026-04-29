@@ -16,7 +16,10 @@ namespace ChatApp.Domain.Entities
         public bool CanUpdateConversation { get; set; } = false;
         public bool CanManageRoles { get; set; } = false;
         public bool CanManageCalls { get; set; } = false;
+        public bool CanAddAdmins { get; set; } = false;
 
         public DateTime GrantedAt { get; set; } = DateTime.UtcNow;
+        public Guid GrantedByUserId { get; set; }
+        public User GrantedByUser { get; set; } = null!;
     }
 }

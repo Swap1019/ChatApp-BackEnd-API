@@ -179,6 +179,11 @@ namespace ChatApp.Infrastructure.Persistence
                     .WithMany(cu => cu.AdminPermissions)
                     .HasForeignKey(cua => new { cua.ConversationId, cua.UserId })
                     .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(cua => cua.GrantedByUser)
+                    .WithMany()
+                    .HasForeignKey(cua => cua.GrantedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             // ===================== CONVERSATION USER BAN =====================
