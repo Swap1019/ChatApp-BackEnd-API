@@ -9,6 +9,8 @@ namespace ChatApp.Infrastructure.Persistence
         public DbSet<UserToken> UserTokens { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<UserSuspension> UserSuspensions { get; set; }
+        public DbSet<UserPrivacy> UserPrivacies { get; set; }
+        public DbSet<UserPrivacyException> UserPrivacyExceptions { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
@@ -81,6 +83,33 @@ namespace ChatApp.Infrastructure.Persistence
                     .WithMany()
                     .HasForeignKey(us => us.SuspendedByUserId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ===================== User Privacy =====================
+            modelBuilder.Entity<UserPrivacy>(entity => 
+            {
+                entity.HasKey(up => up.UserId);
+
+                entity.HasOne(up => up.User)
+                    .WithOne()
+                    .HasForeignKey<UserPrivacy>(up => up.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ===================== User Privacy Exception =====================
+            modelBuilder.Entity<UserPrivacyException>(entity =>
+            {
+                entity.HasKey(upe => upe.Id);
+
+                entity.HasOne(upe => upe.OwnerUser)
+                    .WithMany(u => u.PrivacyExceptionsAsOwner)
+                    .HasForeignKey(upe => upe.OwnerUserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(upe => upe.TargetUser)
+                    .WithMany(u => u.PrivacyExceptionsAsTarget)
+                    .HasForeignKey(upe => upe.TargetUserId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // ===================== PERMISSION =====================

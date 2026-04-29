@@ -71,6 +71,12 @@ namespace ChatApp.Domain.Entities
         public ICollection<BlockedUser> BlockedUsers { get; set; } = new List<BlockedUser>();
         // Inverse navigation property for users who have blocked this user
         public ICollection<BlockedUser> BlockedByUsers { get; set; } = new List<BlockedUser>();
+
+        // Privacy exceptions where this user is the owner (has privacy settings affected)
+        public ICollection<UserPrivacyException> PrivacyExceptionsAsOwner { get; set; } = new List<UserPrivacyException>();
+        // Privacy exceptions where this user is the target (rule applies to them)
+        public ICollection<UserPrivacyException> PrivacyExceptionsAsTarget { get; set; } = new List<UserPrivacyException>();
+
         public User(string username, string phoneNumber, string email, string passwordHash)
         {
             Id = Guid.NewGuid();
