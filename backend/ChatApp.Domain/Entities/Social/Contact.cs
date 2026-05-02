@@ -1,6 +1,8 @@
 using System;
 
-namespace ChatApp.Domain.Entities
+using ChatApp.Domain.Entities.Identity;
+
+namespace ChatApp.Domain.Entities.Social
 {
     public class Contact
     {

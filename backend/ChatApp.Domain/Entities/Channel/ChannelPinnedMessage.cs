@@ -1,17 +1,15 @@
 using ChatApp.Domain.Entities.Identity;
-using ConversationEntities = ChatApp.Domain.Entities.Conversation;
+using ChatApp.Domain.Entities.Messaging;
 
-namespace ChatApp.Domain.Entities.Messaging
+namespace ChatApp.Domain.Entities.Channel
 {
-    public class PinnedMessage
+    public class ChannelPinnedMessage
     {
-        public Guid Id { get; set; }
-
         public Guid MessageId { get; set; }
         public Message Message { get; set; } = null!;
 
-        public Guid ConversationId { get; set; }
-        public ConversationEntities.Conversation Conversation { get; set; } = null!;
+        public Guid ChannelId { get; set; }
+        public Channel Channel { get; set; } = null!;
 
         public Guid PinnedByUserId { get; set; }
         public User PinnedByUser { get; set; } = null!;

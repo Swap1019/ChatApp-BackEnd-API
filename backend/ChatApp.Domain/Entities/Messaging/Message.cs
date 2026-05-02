@@ -1,18 +1,29 @@
 using ChatApp.Domain.Enums;
+using ChatApp.Domain.Entities.Identity;
+using ConversationEntities = ChatApp.Domain.Entities.Conversation;
+using ChannelEntities = ChatApp.Domain.Entities.Channel;
+using MediaEntities = ChatApp.Domain.Entities.Media;
 
-namespace ChatApp.Domain.Entities
+namespace ChatApp.Domain.Entities.Messaging
 {
     public class Message
     {
         public Guid Id { get; set; }
 
         // Foreign key to Conversation
-        public Guid ConversationId { get; set; }
-        public Conversation Conversation { get; set; } = null!;
+        public Guid? ConversationId { get; set; }
+        public ConversationEntities.Conversation? Conversation { get; set; } = null!;
 
-        // Optional: forwarded to another conversation
-        public Guid? ForwardedToConversationId { get; set; }
-        public Conversation? ForwardedToConversation { get; set; }
+        // Foreign key to Channel (if this message is posted in a channel)
+        public Guid? ChannelId { get; set; }
+        public ChannelEntities.Channel? Channel { get; set; }
+
+        // Context type for the message
+        public MessageContextType? ContextType { get; set; }
+
+        // Optional: if this message is a forward, reference the original message
+        public Guid? ForwardedFromMessageId { get; set; }
+        public Message? ForwardedFromMessage { get; set; }
 
         // Foreign key to User (sender)
         public Guid SenderId { get; set; }
@@ -24,8 +35,16 @@ namespace ChatApp.Domain.Entities
         // Message content
         public string Content { get; set; } = null!;
 
+        // Optional sticker
+        public Guid? StickerId { get; set; }
+        public Sticker? Sticker { get; set; }
+
+        // Optional GIF
+        public Guid? GifMediaId { get; set; }
+        public MediaEntities.Media? GifMedia { get; set; }
+
         // Optional media attachments
-        public ICollection<MessageAttachment> MessageAttachments { get; set; } = new List<MessageAttachment>();
+        public ICollection<MediaEntities.MessageAttachment> MessageAttachments { get; set; } = new List<MediaEntities.MessageAttachment>();
 
         // Message state
         public bool IsEdited { get; set; } = false;

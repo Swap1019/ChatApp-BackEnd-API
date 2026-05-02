@@ -1,10 +1,10 @@
-namespace ChatApp.Domain.Entities.Conversation
+namespace ChatApp.Domain.Entities.Channel
 {
-    public class ConversationUrl
+    public class ChannelUrl
     {
         public Guid Id { get; private set; }
-        public Guid ConversationId { get; set; }
-        public Conversation Conversation { get; set; } = null!;
+        public Guid ChannelId { get; set; }
+        public Channel Channel { get; set; } = null!;
 
         public string UrlSlug { get; set; } = null!;
         public bool IsActive { get; set; } = true;
@@ -12,10 +12,10 @@ namespace ChatApp.Domain.Entities.Conversation
         public DateTime? DeactivatedAt { get; set; }
         public string? DeactivatedReason { get; set; }
 
-        public ConversationUrl(Guid conversationId, string urlSlug)
+        public ChannelUrl(Guid channelId, string urlSlug)
         {
             Id = Guid.NewGuid();
-            ConversationId = conversationId;
+            ChannelId = channelId;
             UrlSlug = urlSlug;
         }
 

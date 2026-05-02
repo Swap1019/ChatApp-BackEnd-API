@@ -1,4 +1,9 @@
-using ChatApp.Domain.Entities;
+using ChatApp.Domain.Entities.Identity;
+using ChatApp.Domain.Entities.Conversation;
+using ChatApp.Domain.Entities.Media;
+using ChatApp.Domain.Entities.Messaging;
+using ChatApp.Domain.Entities.Social;
+using ChatApp.Domain.Entities.Channel;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Infrastructure.Persistence
@@ -32,9 +37,12 @@ namespace ChatApp.Infrastructure.Persistence
         public DbSet<StorySeen> StorySeens { get; set; }
 
         public DbSet<Media> Media { get; set; }
+        public DbSet<Avatar> Avatars { get; set; }
         public DbSet<MediaModeration> MediaModerations { get; set; }
         public DbSet<MessageAttachment> MessageAttachments { get; set; }
         public DbSet<PostAttachment> PostAttachments { get; set; }
+        public DbSet<GifMetadata> GifMetadatas { get; set; }
+        public DbSet<UserRecentGif> UserRecentGifs { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
@@ -204,15 +212,20 @@ namespace ChatApp.Infrastructure.Persistence
             // ===================== CONVERSATION ADMIN =====================
             modelBuilder.Entity<ConversationUserAdmin>(entity =>
             {
+                entity.HasKey(cua => cua.ConversationUserId);
+
                 entity.HasOne(cua => cua.ConversationUser)
-                    .WithMany(cu => cu.AdminPermissions)
-                    .HasForeignKey(cua => new { cua.ConversationId, cua.UserId })
+                    .WithOne(cu => cu.AdminPermissions)
+                    .HasForeignKey<ConversationUserAdmin>(cua => cua.ConversationUserId)
                     .OnDelete(DeleteBehavior.Cascade);
                 
                 entity.HasOne(cua => cua.GrantedByUser)
                     .WithMany()
                     .HasForeignKey(cua => cua.GrantedByUserId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                // Unique constraint on (ConversationUserId, GrantedByUserId) to prevent duplicate grants
+                entity.HasIndex(cua => new { cua.ConversationUserId, cua.GrantedByUserId }).IsUnique();
             });
 
             // ===================== CONVERSATION USER BAN =====================
@@ -230,6 +243,9 @@ namespace ChatApp.Infrastructure.Persistence
                 entity.HasIndex(b => b.BannedAt);
                 entity.HasIndex(b => new { b.ConversationId, b.ExpiresAt });
                 entity.HasIndex(b => b.IsRevoked);
+
+                // Unique constraint on (ConversationId, UserId, BannedByUserId) to track ban hierarchy
+                entity.HasIndex(b => new { b.ConversationId, b.UserId, b.BannedByUserId }).IsUnique();
 
                 entity.HasOne(b => b.Conversation)
                     .WithMany(c => c.BannedUsers)
@@ -291,15 +307,21 @@ namespace ChatApp.Infrastructure.Persistence
                     .HasForeignKey(m => m.SenderId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(m => m.ForwardedToConversation)
+                entity.HasOne(m => m.ForwardedFromMessage)
                     .WithMany()
-                    .HasForeignKey(m => m.ForwardedToConversationId)
+                    .HasForeignKey(m => m.ForwardedFromMessageId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(m => m.Thread)
                     .WithMany(t => t.Messages)
                     .HasForeignKey(m => m.ThreadId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                // GIF relationship - optional GIF media in a message
+                entity.HasOne(m => m.GifMedia)
+                    .WithMany()
+                    .HasForeignKey(m => m.GifMediaId)
+                    .OnDelete(DeleteBehavior.SetNull);
                 
                 entity.HasIndex(m => m.CreatedAt);
 
@@ -597,6 +619,155 @@ namespace ChatApp.Infrastructure.Persistence
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
+            // ===================== CHANNEL =====================
+            modelBuilder.Entity<Channel>(entity =>
+            {
+                entity.HasQueryFilter(c => !c.IsDeleted);
+
+                entity.HasOne(c => c.CreatorUser)
+                    .WithMany()
+                    .HasForeignKey(c => c.CreatorUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(c => c.UrlHistory)
+                    .WithOne(cu => cu.Channel)
+                    .HasForeignKey(cu => cu.ChannelId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ===================== CHANNEL USER =====================
+            modelBuilder.Entity<ChannelUser>(entity =>
+            {
+                entity.HasKey(cu => new { cu.ChannelId, cu.UserId });
+
+                entity.HasIndex(cu => cu.UserId);
+                entity.HasIndex(cu => cu.ChannelId);
+
+                entity.HasOne(cu => cu.Channel)
+                    .WithMany(c => c.Subscribers)
+                    .HasForeignKey(cu => cu.ChannelId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cu => cu.User)
+                    .WithMany()
+                    .HasForeignKey(cu => cu.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ===================== CHANNEL ADMIN =====================
+            modelBuilder.Entity<ChannelUserAdmin>(entity =>
+            {
+                entity.HasKey(cua => cua.ChannelUserId);
+
+                entity.HasOne(cua => cua.ChannelUser)
+                    .WithOne(cu => cu.AdminPermissions)
+                    .HasForeignKey<ChannelUserAdmin>(cua => cua.ChannelUserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(cua => cua.GrantedByUser)
+                    .WithMany()
+                    .HasForeignKey(cua => cua.GrantedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Unique constraint on (ChannelUserId, GrantedByUserId) to prevent duplicate grants
+                entity.HasIndex(cua => new { cua.ChannelUserId, cua.GrantedByUserId }).IsUnique();
+            });
+
+            // ===================== CHANNEL USER BAN =====================
+            modelBuilder.Entity<ChannelUserBan>(entity =>
+            {
+                entity.HasKey(b => new { b.ChannelId, b.UserId });
+
+                entity.HasIndex(b => b.UserId);
+                entity.HasIndex(b => b.BannedByUserId);
+                entity.HasIndex(b => b.BannedAt);
+
+                entity.HasOne(b => b.Channel)
+                    .WithMany(c => c.BannedUsers)
+                    .HasForeignKey(b => b.ChannelId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(b => b.User)
+                    .WithMany()
+                    .HasForeignKey(b => b.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(b => b.BannedByUser)
+                    .WithMany()
+                    .HasForeignKey(b => b.BannedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Unique constraint on (ChannelId, UserId, BannedByUserId) to track ban hierarchy
+                entity.HasIndex(b => new { b.ChannelId, b.UserId, b.BannedByUserId }).IsUnique();
+            });
+
+            // ===================== CHANNEL URL =====================
+            modelBuilder.Entity<ChannelUrl>(entity =>
+            {
+                entity.HasKey(cu => cu.Id);
+
+                entity.HasIndex(cu => cu.ChannelId);
+                entity.HasIndex(cu => cu.UrlSlug).IsUnique();
+                entity.HasIndex(cu => cu.IsActive);
+
+                entity.HasOne(cu => cu.Channel)
+                    .WithMany(c => c.UrlHistory)
+                    .HasForeignKey(cu => cu.ChannelId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(cu => cu.UrlSlug)
+                    .IsRequired()
+                    .HasMaxLength(100);
+            });
+
+            // ===================== AVATAR =====================
+            modelBuilder.Entity<Avatar>(entity =>
+            {
+                entity.HasKey(a => a.Id);
+
+                // Soft delete filter
+                entity.HasQueryFilter(a => !a.IsDeleted);
+
+                // Indexes for fast lookup
+                entity.HasIndex(a => new { a.OwnerType, a.OwnerId });
+                entity.HasIndex(a => a.MediaId);
+                entity.HasIndex(a => a.UploadedByUserId);
+
+                // Enforce ONLY ONE active avatar per owner
+                entity.HasIndex(a => new { a.OwnerType, a.OwnerId, a.IsActive })
+                .IsUnique();
+
+                // Relationships
+
+                // Avatar → Media (1-to-1-ish but technically many avatars could reuse media if you allow it)
+                entity.HasOne(a => a.Media)
+                    .WithMany()
+                    .HasForeignKey(a => a.MediaId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Avatar → UploadedByUser
+                entity.HasOne(a => a.UploadedByUser)
+                    .WithMany()
+                    .HasForeignKey(a => a.UploadedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Properties
+                entity.Property(a => a.OwnerType)
+                    .IsRequired();
+
+                entity.Property(a => a.Version)
+                    .IsRequired();
+
+                entity.Property(a => a.IsActive)
+                    .IsRequired();
+
+                entity.Property(a => a.IsDeleted)
+                    .IsRequired();
+
+                entity.Property(a => a.CreatedAt)
+                    .IsRequired();
+            });
+
             // ===================== Notifications =====================
             modelBuilder.Entity<Notification>(entity =>
             {
@@ -610,6 +781,56 @@ namespace ChatApp.Infrastructure.Persistence
                 entity.HasOne<User>()
                     .WithMany()
                     .HasForeignKey(n => n.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ===================== GIF METADATA =====================
+            modelBuilder.Entity<GifMetadata>(entity =>
+            {
+                entity.HasKey(g => g.Id);
+
+                entity.HasIndex(g => g.MediaId).IsUnique();
+                entity.HasIndex(g => g.IsTrending);
+                entity.HasIndex(g => g.UsageCount);
+                entity.HasIndex(g => g.CreatedAt);
+                entity.HasIndex(g => g.IsDeleted);
+
+                // One-to-one relationship with Media (for GIF files specifically)
+                entity.HasOne(g => g.Media)
+                    .WithOne(m => m.GifMetadata)
+                    .HasForeignKey<GifMetadata>(g => g.MediaId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Configure Tags as a collection of strings (JSON array in PostgreSQL)
+                entity.Property(g => g.Tags)
+                    .HasConversion(
+                        v => string.Join(',', v),
+                        v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList())
+                    .HasMaxLength(1000);
+
+                entity.Property(g => g.EmojiHint).HasMaxLength(10);
+                entity.Property(g => g.Title).HasMaxLength(255);
+            });
+
+            // ===================== USER RECENT GIF =====================
+            modelBuilder.Entity<UserRecentGif>(entity =>
+            {
+                entity.HasKey(urm => new { urm.UserId, urm.MediaId });
+
+                entity.HasIndex(urm => urm.UserId);
+                entity.HasIndex(urm => urm.MediaId);
+                entity.HasIndex(urm => urm.LastUsedAt).IsDescending();
+
+                // Relationship to User
+                entity.HasOne(urm => urm.User)
+                    .WithMany(u => u.UserRecentGifs)
+                    .HasForeignKey(urm => urm.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Relationship to Media (the GIF file)
+                entity.HasOne(urm => urm.Media)
+                    .WithMany(m => m.UserRecentGifs)
+                    .HasForeignKey(urm => urm.MediaId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }

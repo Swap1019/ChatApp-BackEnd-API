@@ -1,4 +1,6 @@
-namespace ChatApp.Domain.Entities
+using ChatApp.Domain.Entities.Social;
+
+namespace ChatApp.Domain.Entities.Media
 {
     public class PostAttachment
     {

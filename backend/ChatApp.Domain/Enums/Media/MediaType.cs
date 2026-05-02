@@ -4,9 +4,10 @@ namespace ChatApp.Domain.Enums
     {
         Image,
         Video,
+        Gif,
         Audio,
         VoiceMessage,
         VideoMessage,
-        File
+        File,
     }
 }

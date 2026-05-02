@@ -1,4 +1,7 @@
-namespace ChatApp.Domain.Entities
+using ChatApp.Domain.Entities.Identity;
+using ChatApp.Domain.Entities.Media;
+
+namespace ChatApp.Domain.Entities.Social
 {
     public class Post
     {

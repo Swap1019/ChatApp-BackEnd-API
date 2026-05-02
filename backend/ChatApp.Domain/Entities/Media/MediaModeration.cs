@@ -1,6 +1,8 @@
 using ChatApp.Domain.Enums;
 
-namespace ChatApp.Domain.Entities
+using ChatApp.Domain.Entities.Identity;
+
+namespace ChatApp.Domain.Entities.Media
 {
     public class MediaModeration
     {

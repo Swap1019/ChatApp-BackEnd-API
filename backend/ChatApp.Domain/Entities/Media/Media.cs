@@ -1,7 +1,9 @@
 using ChatApp.Domain.ValueObjects;
 using ChatApp.Domain.Enums;
+using ChatApp.Domain.Entities.Identity;
+using ChatApp.Domain.Entities.Social;
 
-namespace ChatApp.Domain.Entities
+namespace ChatApp.Domain.Entities.Media
 {
     public class Media
     {
@@ -40,5 +42,9 @@ namespace ChatApp.Domain.Entities
         // Navigation properties for attachments
         public ICollection<MessageAttachment> MessageAttachments { get; set; } = new List<MessageAttachment>();
         public ICollection<PostAttachment> PostAttachments { get; set; } = new List<PostAttachment>();
+
+        // GIF-related navigations
+        public GifMetadata? GifMetadata { get; set; } // One-to-one if this Media is a GIF
+        public ICollection<UserRecentGif> UserRecentGifs { get; set; } = new List<ChatApp.Domain.Entities.Social.UserRecentGif>();
     }
 }

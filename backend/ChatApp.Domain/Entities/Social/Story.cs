@@ -1,4 +1,7 @@
-namespace ChatApp.Domain.Entities
+using ChatApp.Domain.Entities.Identity;
+using MediaEntities = ChatApp.Domain.Entities.Media;
+
+namespace ChatApp.Domain.Entities.Social
 {
     public class Story
     {
@@ -21,7 +24,7 @@ namespace ChatApp.Domain.Entities
 
         // A story can have only one media attachment
         public Guid MediaId { get; set; }
-        public Media Media { get; set; } = null!;
+        public MediaEntities.Media Media { get; set; } = null!;
         public ICollection<StorySeen> SeenBy { get; set; } = new List<StorySeen>();
     }
 }

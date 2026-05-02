@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ChatApp.Domain.Entities
+namespace ChatApp.Domain.Entities.Identity
 {
     public class UserToken
     {

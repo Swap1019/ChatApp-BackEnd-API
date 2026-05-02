@@ -1,4 +1,4 @@
-namespace ChatApp.Domain.Entities
+namespace ChatApp.Domain.Entities.Messaging
 {
     public class MessageThread
     {

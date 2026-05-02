@@ -1,4 +1,7 @@
-namespace ChatApp.Domain.Entities
+using ChatApp.Domain.Entities.Identity;
+using ChatApp.Domain.Entities.Messaging;
+
+namespace ChatApp.Domain.Entities.Conversation
 {
     public class Conversation
     {
@@ -14,7 +17,8 @@ namespace ChatApp.Domain.Entities
         public bool IsDeleted { get; set; } = false;
         public DateTime? DeletedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public string? UpdatedBy { get; set; }
+        public Guid UpdatedById { get; set; }
+        public User UpdatedBy { get; set; } = null!;
         public bool OnlyAdminsCanSendMeesage { get; set; } = false;
 
         // URL sharing properties
@@ -50,7 +54,7 @@ namespace ChatApp.Domain.Entities
             IsGroup = isGroup;
         }
 
-        public void UpdateConversation(string? name, string? description, string? avatarUrl, string updatedBy)
+        public void UpdateConversation(string? name, string? description, string? avatarUrl, Guid updatedById)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Conversation name is required.", nameof(name));
@@ -59,23 +63,23 @@ namespace ChatApp.Domain.Entities
             Description = description;
             AvatarUrl = avatarUrl;
             UpdatedAt = DateTime.UtcNow;
-            UpdatedBy = updatedBy;
+            UpdatedById = updatedById;
         }
 
-        public void MarkAsDeleted(string deletedBy)
+        public void MarkAsDeleted(Guid deletedById)
         {
             IsDeleted = true;
             DeletedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
-            UpdatedBy = deletedBy;
+            UpdatedById = deletedById;
         }
 
-        public void MarkAsActive(string updatedBy)
+        public void MarkAsActive(Guid updatedById)
         {
             IsDeleted = false;
             DeletedAt = null;
             UpdatedAt = DateTime.UtcNow;
-            UpdatedBy = updatedBy;
+            UpdatedById = updatedById;
         }
 
         public void UpdateLastMessageTime()

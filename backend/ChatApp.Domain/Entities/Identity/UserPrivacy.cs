@@ -1,7 +1,6 @@
-using ChatApp.Domain.Entities;
 using ChatApp.Domain.Enums;
 
-namespace ChatApp.Domain.Entities
+namespace ChatApp.Domain.Entities.Identity
 {
     public class UserPrivacy
     {

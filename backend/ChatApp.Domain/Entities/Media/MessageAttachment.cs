@@ -1,4 +1,6 @@
-namespace ChatApp.Domain.Entities
+using ChatApp.Domain.Entities.Messaging;
+
+namespace ChatApp.Domain.Entities.Media
 {
     public class MessageAttachment
     {

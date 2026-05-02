@@ -1,6 +1,6 @@
 using ChatApp.Domain.Enums;
 
-namespace ChatApp.Domain.Entities
+namespace ChatApp.Domain.Entities.Media
 {
     public class SensitiveContentFlag
     {

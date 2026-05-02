@@ -1,7 +1,6 @@
-using ChatApp.Domain.Entities;
 using ChatApp.Domain.Enums;
 
-namespace ChatApp.Domain.Entities
+namespace ChatApp.Domain.Entities.Identity
 {
     public class UserPrivacyException
     {
@@ -14,6 +13,6 @@ namespace ChatApp.Domain.Entities
 
         public PrivacyField Field { get; set; }   // Phone, Photo, etc.
 
-        public PrivacyOverrideType OverrideType { get; set; } // Allow / Deny
+        public bool IsAllowed { get; set; }   // true = allow, false = deny
     }
 }
