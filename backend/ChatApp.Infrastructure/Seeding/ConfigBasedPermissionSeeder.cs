@@ -1,4 +1,4 @@
-using ChatApp.Domain.Entities;
+using ChatApp.Domain.Entities.Identity;
 using ChatApp.Infrastructure.Persistence;
 using ChatApp.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
