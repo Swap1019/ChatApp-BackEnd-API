@@ -1,3 +1,4 @@
+using ChatApp.Application.Abstractions.Persistence;
 using ChatApp.Domain.Entities.Identity;
 using ChatApp.Domain.Entities.Conversation;
 using ChatApp.Domain.Entities.Media;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Infrastructure.Persistence
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : DbContext, IAppDbContext
     {
         public DbSet<User> Users { get; set; }
         public DbSet<UserToken> UserTokens { get; set; }
@@ -26,6 +27,15 @@ namespace ChatApp.Infrastructure.Persistence
         public DbSet<ConversationUserAdmin> ConversationUserAdmins { get; set; }
         public DbSet<ConversationUrl> ConversationUrls { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<MessageThread> MessageThreads { get; set; }
+        public DbSet<MessageRead> MessageReads { get; set; }
+        public DbSet<MessageReaction> MessageReactions { get; set; }
+        public DbSet<MessageDeletion> MessageDeletions { get; set; }
+        public DbSet<PinnedMessage> PinnedMessages { get; set; }
+        public DbSet<StickerPack> StickerPacks { get; set; }
+        public DbSet<Sticker> Stickers { get; set; }
+        public DbSet<UserStickerPack> UserStickerPacks { get; set; }
+        public DbSet<UserRecentSticker> UserRecentStickers { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<BlockedUser> BlockedUsers { get; set; }
         public DbSet<Notification> Notifications { get; set; }
@@ -39,10 +49,18 @@ namespace ChatApp.Infrastructure.Persistence
         public DbSet<Media> Media { get; set; }
         public DbSet<Avatar> Avatars { get; set; }
         public DbSet<MediaModeration> MediaModerations { get; set; }
+        public DbSet<SensitiveContentFlag> SensitiveContentFlags { get; set; }
         public DbSet<MessageAttachment> MessageAttachments { get; set; }
         public DbSet<PostAttachment> PostAttachments { get; set; }
         public DbSet<GifMetadata> GifMetadatas { get; set; }
         public DbSet<UserRecentGif> UserRecentGifs { get; set; }
+
+        public DbSet<Channel> Channels { get; set; }
+        public DbSet<ChannelUser> ChannelUsers { get; set; }
+        public DbSet<ChannelUserAdmin> ChannelUserAdmins { get; set; }
+        public DbSet<ChannelUserBan> ChannelUserBans { get; set; }
+        public DbSet<ChannelUrl> ChannelUrls { get; set; }
+        public DbSet<ChannelPinnedMessage> ChannelPinnedMessages { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }

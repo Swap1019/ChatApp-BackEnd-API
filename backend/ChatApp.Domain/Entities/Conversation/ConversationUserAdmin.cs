@@ -9,6 +9,7 @@ namespace ChatApp.Domain.Entities.Conversation
         public ConversationUser ConversationUser { get; set; } = null!;
 
         // Admin permissions
+        public bool CanAddMembers { get; set; } = false;
         public bool CanKickMembers { get; set; } = false;
         public bool CanPinMessages { get; set; } = false;
         public bool CanDeleteMessages { get; set; } = false;
