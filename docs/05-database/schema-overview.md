@@ -5,6 +5,9 @@ Status: domain schema implemented through EF Core.
 The current schema is defined by `ChatApp.Infrastructure/DbContext/AppDbContext.cs`
 and the migrations under `ChatApp.API/Migrations`.
 
+The current DBML diagram source is maintained in
+[chatapp-schema.dbml](chatapp-schema.dbml).
+
 Major areas:
 
 - Identity: users, sessions, tokens, roles, permissions, privacy, suspensions

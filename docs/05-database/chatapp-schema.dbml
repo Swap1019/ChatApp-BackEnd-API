@@ -1,0 +1,724 @@
+// Complete ChatApp Database Schema (PascalCase)
+// Generated from current ChatApp.Domain entities and AppDbContext.
+// Last updated: May 9, 2026
+
+// Notes:
+// - Enum properties are represented as varchar for dbdiagram readability.
+// - Owned Media.Metadata fields are represented with Metadata_* columns.
+// - ConversationUserAdmins.ConversationUserId and ChannelUserAdmins.ChannelUserId
+//   match the current entity classes, but the parent membership entities use
+//   composite keys. Add a surrogate Id to membership entities or change admin
+//   entities back to composite membership keys before the next migration.
+
+// ==================== IDENTITY & AUTHENTICATION ====================
+
+Table Users {
+  Id uuid [primary key]
+  Username varchar [unique, not null]
+  Email varchar [unique, not null]
+  PhoneNumber varchar [unique, not null]
+  PasswordHash varchar [not null]
+  IsEmailVerified boolean
+  IsPhoneNumberVerified boolean
+  FailedLoginAttempts integer
+  LockoutEnd timestamp
+  SecurityStamp varchar
+  ConcurrencyStamp varchar
+  OnlineStatus varchar
+  LastActiveAt timestamp
+  CreatedAt timestamp
+  LastLoginAt timestamp
+  AccountStatus varchar
+}
+
+Table UserTokens {
+  Id uuid [primary key]
+  UserId uuid [not null]
+  Token varchar [not null]
+  Type varchar [not null]
+  CreatedAt timestamp
+  ExpiresAt timestamp
+  IsUsed boolean
+  ConsumedAt timestamp
+}
+
+Table UserSessions {
+  Id uuid [primary key]
+  UserId uuid [not null]
+  DeviceInfo varchar [not null]
+  IPAddress varchar [not null]
+  RefreshToken varchar [not null]
+  CreatedAt timestamp
+  ExpiresAt timestamp
+  IsRevoked boolean
+  RevokeReason varchar
+  LastActivityAt timestamp
+}
+
+Table UserSuspensions {
+  Id uuid [primary key]
+  UserId uuid [not null]
+  SuspendedByUserId uuid
+  Reason varchar [not null]
+  CreatedAt timestamp
+  EndsAt timestamp
+  IsDeleted boolean
+  DeletedAt timestamp
+}
+
+Table UserPrivacies {
+  UserId uuid [primary key]
+  PhoneNumberPrivacy varchar
+  SearchByPhoneNumberPrivacy varchar
+  EmailPrivacy varchar
+  LastSeenAndOnlinePrivacy varchar
+  ProfilePhotoPrivacy varchar
+  ForwardedMessagesPrivacy varchar
+  CallPrivacy varchar
+  BioPrivacy varchar
+  GroupInvitationsPrivacy varchar
+  ReadReceiptsPrivacy varchar
+  AllowDirectMessagesPrivacy varchar
+  StoriesPrivacy varchar
+  PostsPrivacy varchar
+  CreatedAt timestamp
+  UpdatedAt timestamp
+  DeletedAt timestamp
+  IsDeleted boolean
+}
+
+Table UserPrivacyExceptions {
+  Id uuid [primary key]
+  OwnerUserId uuid [not null]
+  TargetUserId uuid [not null]
+  Field varchar [not null]
+  IsAllowed boolean
+
+  Indexes {
+    (OwnerUserId, TargetUserId, Field) [unique]
+  }
+}
+
+Table Roles {
+  Id uuid [primary key]
+  Name varchar [not null, unique]
+  Description varchar
+  CreatedAt timestamp
+  IsSystemRole boolean
+}
+
+Table Permissions {
+  Id uuid [primary key]
+  Codename varchar [not null, unique]
+  Name varchar [not null]
+  Description varchar
+  CreatedAt timestamp
+}
+
+Table UserRoles {
+  UserId uuid [not null]
+  RoleId uuid [not null]
+  AssignedAt timestamp
+  AssignedBy varchar
+
+  primary key (UserId, RoleId)
+}
+
+Table RolePermissions {
+  RoleId uuid [not null]
+  PermissionId uuid [not null]
+  AssignedAt timestamp
+
+  primary key (RoleId, PermissionId)
+}
+
+// ==================== CONVERSATIONS ====================
+
+Table Conversations {
+  Id uuid [primary key]
+  Name varchar [not null]
+  IsGroup boolean
+  CreatedAt timestamp
+  CreatedById uuid [not null]
+  LastMessageAt timestamp
+  AvatarUrl varchar
+  Description varchar
+  IsDeleted boolean
+  DeletedAt timestamp
+  UpdatedAt timestamp
+  UpdatedById uuid
+  OnlyAdminsCanSendMeesage boolean
+  ActiveUrlSlug varchar [unique]
+  UrlSlugUpdatedAt timestamp
+}
+
+Table ConversationUsers {
+  ConversationId uuid [not null]
+  UserId uuid [not null]
+  IsAdmin boolean
+  JoinedAt timestamp
+  LastSeenMessageSequence bigint
+  LastSeenAt timestamp
+
+  primary key (ConversationId, UserId)
+}
+
+Table ConversationUserAdmins {
+  ConversationUserId uuid [primary key]
+  CanAddMembers boolean
+  CanKickMembers boolean
+  CanPinMessages boolean
+  CanDeleteMessages boolean
+  CanUpdateConversation boolean
+  CanManageRoles boolean
+  CanManageCalls boolean
+  CanAddAdmins boolean
+  IsAnonymousAdmin boolean
+  GrantedAt timestamp
+  GrantedByUserId uuid [not null]
+
+  Indexes {
+    (ConversationUserId, GrantedByUserId) [unique]
+  }
+}
+
+Table ConversationUserBans {
+  ConversationId uuid [not null]
+  UserId uuid [not null]
+  BannedByUserId uuid [not null]
+  BannedAt timestamp
+  Reason varchar
+  ExpiresAt timestamp
+  IsRevoked boolean
+  RevokedAt timestamp
+  RevokedByUserId uuid
+
+  primary key (ConversationId, UserId)
+
+  Indexes {
+    (ConversationId, UserId, BannedByUserId) [unique]
+  }
+}
+
+Table ConversationUrls {
+  Id uuid [primary key]
+  ConversationId uuid [not null]
+  UrlSlug varchar [not null, unique]
+  IsActive boolean
+  CreatedAt timestamp
+  DeactivatedAt timestamp
+  DeactivatedReason varchar
+}
+
+// ==================== CHANNELS ====================
+
+Table Channels {
+  Id uuid [primary key]
+  Name varchar [not null]
+  Description varchar [not null]
+  AvatarUrl varchar
+  CreatorUserId uuid [not null]
+  CreatedAt timestamp
+  UpdatedAt timestamp
+  IsDeleted boolean
+  DeletedAt timestamp
+  DeletedBy varchar
+  OnlyAdminsCanSendMessage boolean
+  IsPrivate boolean
+  AccessCode varchar
+  AccessCodeExpiresAt timestamp
+  IsArchived boolean
+  ArchivedAt timestamp
+  ArchivedBy varchar
+  IsDiscoverable boolean
+}
+
+Table ChannelUsers {
+  ChannelId uuid [not null]
+  UserId uuid [not null]
+  JoinedAt timestamp
+
+  primary key (ChannelId, UserId)
+}
+
+Table ChannelUserAdmins {
+  ChannelUserId uuid [primary key]
+  CanKickMembers boolean
+  CanPinMessages boolean
+  CanDeleteMessages boolean
+  CanUpdateChannel boolean
+  CanManageRoles boolean
+  CanManageCalls boolean
+  CanAddAdmins boolean
+  SignName boolean
+  GrantedAt timestamp
+  GrantedByUserId uuid [not null]
+
+  Indexes {
+    (ChannelUserId, GrantedByUserId) [unique]
+  }
+}
+
+Table ChannelUserBans {
+  ChannelId uuid [not null]
+  UserId uuid [not null]
+  BannedByUserId uuid [not null]
+  BannedAt timestamp
+
+  primary key (ChannelId, UserId)
+
+  Indexes {
+    (ChannelId, UserId, BannedByUserId) [unique]
+  }
+}
+
+Table ChannelUrls {
+  Id uuid [primary key]
+  ChannelId uuid [not null]
+  UrlSlug varchar [not null, unique]
+  IsActive boolean
+  CreatedAt timestamp
+  DeactivatedAt timestamp
+  DeactivatedReason varchar
+}
+
+Table ChannelPinnedMessages {
+  MessageId uuid [not null]
+  ChannelId uuid [not null]
+  PinnedByUserId uuid [not null]
+  Order integer
+  CreatedAt timestamp
+
+  primary key (MessageId, ChannelId)
+
+  Indexes {
+    (ChannelId, Order) [unique]
+  }
+}
+
+// ==================== MESSAGING ====================
+
+Table Messages {
+  Id uuid [primary key]
+  ConversationId uuid
+  ChannelId uuid
+  ContextType varchar
+  ForwardedFromMessageId uuid
+  SenderId uuid [not null]
+  Sequence bigint
+  Content text [not null]
+  StickerId uuid
+  GifMediaId uuid
+  IsEdited boolean
+  IsDeleted boolean
+  DeletedAt timestamp
+  CreatedAt timestamp
+  EditedAt timestamp
+  MessageStatus varchar
+  ReferenceType varchar
+  ReferenceId uuid
+  RepliedMessageId uuid
+  ThreadId uuid
+  IsThreadRoot boolean
+
+  Indexes {
+    (ConversationId, Sequence)
+    (ConversationId, CreatedAt)
+  }
+}
+
+Table MessageThreads {
+  Id uuid [primary key]
+  RootMessageId uuid [not null]
+  CreatedAt timestamp
+  LastMessageId uuid
+  ReplyCount integer
+}
+
+Table MessageAttachments {
+  MessageId uuid [not null]
+  MediaId uuid [not null]
+  SortOrder integer
+
+  primary key (MessageId, MediaId)
+}
+
+Table MessageReactions {
+  MessageId uuid [not null]
+  UserId uuid [not null]
+  Emoji varchar [not null]
+  CreatedAt timestamp
+
+  primary key (MessageId, UserId, Emoji)
+}
+
+Table MessageDeletions {
+  MessageId uuid [not null]
+  UserId uuid [not null]
+  DeletedByUserId uuid [not null]
+  Scope varchar
+  DeletedAt timestamp
+
+  primary key (MessageId, UserId)
+}
+
+Table MessageReads {
+  MessageId uuid [not null]
+  UserId uuid [not null]
+  ReadAt timestamp [not null]
+
+  primary key (MessageId, UserId)
+}
+
+Table PinnedMessages {
+  Id uuid [primary key]
+  MessageId uuid [not null]
+  ConversationId uuid [not null]
+  PinnedByUserId uuid [not null]
+  Order integer
+  CreatedAt timestamp
+
+  Indexes {
+    (ConversationId, Order) [unique]
+  }
+}
+
+Table Notifications {
+  Id uuid [primary key]
+  UserId uuid [not null]
+  Type varchar
+  ReferenceId uuid
+  Data text
+  Priority integer
+  GroupingId uuid
+  IsRead boolean
+  CreatedAt timestamp
+  IsDeleted boolean
+  DeletedAt timestamp
+}
+
+// ==================== STICKERS & GIFS ====================
+
+Table StickerPacks {
+  Id uuid [primary key]
+  Name varchar [not null]
+  Description varchar
+  CoverMediaId uuid
+  IsOfficial boolean
+  IsActive boolean
+  CreatedAt timestamp
+}
+
+Table Stickers {
+  Id uuid [primary key]
+  StickerPackId uuid [not null]
+  MediaId uuid [not null]
+  Emoji varchar
+  Order integer
+  IsAnimated boolean
+  IsActive boolean
+  CreatedAt timestamp
+}
+
+Table UserStickerPacks {
+  UserId uuid [not null]
+  StickerPackId uuid [not null]
+  AddedAt timestamp
+
+  primary key (UserId, StickerPackId)
+}
+
+Table UserRecentStickers {
+  UserId uuid [not null]
+  StickerId uuid [not null]
+  LastUsedAt timestamp
+
+  primary key (UserId, StickerId)
+}
+
+Table GifMetadatas {
+  Id uuid [primary key]
+  MediaId uuid [not null, unique]
+  Title varchar
+  Tags varchar
+  EmojiHint varchar
+  IsTrending boolean
+  UsageCount integer
+  CreatedAt timestamp
+  UpdatedAt timestamp
+  IsDeleted boolean
+  DeletedAt timestamp
+}
+
+Table UserRecentGifs {
+  UserId uuid [not null]
+  MediaId uuid [not null]
+  LastUsedAt timestamp
+  UsageCount integer
+  AddedAt timestamp
+
+  primary key (UserId, MediaId)
+}
+
+// ==================== MEDIA ====================
+
+Table Media {
+  Id uuid [primary key]
+  UploadedByUserId uuid [not null]
+  Url varchar [not null]
+  FileName varchar [not null]
+  SizeBytes bigint
+  Type varchar
+  ProcessingStatus varchar
+  ContentHash varchar
+  StorageProvider varchar
+  StorageKey varchar
+  CreatedAt timestamp
+  DeletedAt timestamp
+  IsDeleted boolean
+  Metadata_Width integer
+  Metadata_Height integer
+  Metadata_Duration bigint
+  Metadata_ThumbnailUrl varchar
+  Metadata_OriginalFileName varchar
+}
+
+Table Avatars {
+  Id uuid [primary key]
+  MediaId uuid [not null]
+  OwnerType varchar [not null]
+  OwnerId uuid [not null]
+  UploadedByUserId uuid [not null]
+  Version integer
+  IsActive boolean
+  IsDeleted boolean
+  CreatedAt timestamp
+  UpdatedAt timestamp
+  DeletedAt timestamp
+
+  Indexes {
+    (OwnerType, OwnerId)
+    (OwnerType, OwnerId, IsActive) [unique]
+  }
+}
+
+Table MediaModerations {
+  Id uuid [primary key]
+  MediaId uuid [not null]
+  IsSensitive boolean
+  Labels varchar
+  Confidence float
+  ReviewStatus varchar
+  ReviewedById uuid
+  ReviewedAt timestamp
+}
+
+Table SensitiveContentFlags {
+  Id uuid [primary key]
+  MediaId uuid [not null]
+  Type varchar
+  Severity varchar
+  Confidence float
+  Reason varchar
+  DetectedAt timestamp
+  ModelVersion varchar
+  IsReviewed boolean
+  IsApproved boolean
+  ReviewedAt timestamp
+  ReviewedBy varchar
+}
+
+Table PostAttachments {
+  PostId uuid [not null]
+  MediaId uuid [not null]
+  SortOrder integer
+
+  primary key (PostId, MediaId)
+}
+
+// ==================== SOCIAL - POSTS ====================
+
+Table Posts {
+  Id uuid [primary key]
+  UserId uuid [not null]
+  Sequence bigint
+  Caption varchar
+  ViewsCount integer
+  IsDeleted boolean
+  DeletedAt timestamp
+  CreatedAt timestamp
+
+  Indexes {
+    (UserId, CreatedAt)
+    (UserId, Sequence)
+  }
+}
+
+Table PostLikes {
+  PostId uuid [not null]
+  UserId uuid [not null]
+  CreatedAt timestamp
+
+  primary key (PostId, UserId)
+}
+
+// ==================== SOCIAL - STORIES ====================
+
+Table Stories {
+  Id uuid [primary key]
+  UserId uuid [not null]
+  Sequence bigint
+  Caption varchar
+  ViewsCount integer
+  CreatedAt timestamp
+  ExpiresAt timestamp
+  IsDeleted boolean
+  DeletedAt timestamp
+  MediaId uuid [not null]
+
+  Indexes {
+    (UserId, CreatedAt)
+    (UserId, ExpiresAt)
+  }
+}
+
+Table StorySeens {
+  StoryId uuid [not null]
+  UserId uuid [not null]
+  SeenAt timestamp
+
+  primary key (StoryId, UserId)
+}
+
+// ==================== SOCIAL - CONTACTS & BLOCKING ====================
+
+Table Contacts {
+  Id uuid [primary key]
+  UserId uuid [not null]
+  ContactUserId uuid [not null]
+  Nickname varchar
+  Notes varchar
+  IsFavorite boolean
+  CreatedAt timestamp
+  UpdatedAt timestamp
+
+  Indexes {
+    (UserId, ContactUserId) [unique]
+  }
+}
+
+Table BlockedUsers {
+  Id uuid [primary key]
+  UserId uuid [not null]
+  BlockedUserId uuid [not null]
+  Reason varchar
+  CreatedAt timestamp
+
+  Indexes {
+    (UserId, BlockedUserId) [unique]
+  }
+}
+
+// ==================== RELATIONSHIPS ====================
+
+// Identity Relationships
+Ref: UserTokens.UserId > Users.Id [delete: cascade]
+Ref: UserSessions.UserId > Users.Id [delete: cascade]
+Ref: UserSuspensions.UserId > Users.Id [delete: cascade]
+Ref: UserSuspensions.SuspendedByUserId > Users.Id [delete: restrict]
+Ref: UserPrivacies.UserId > Users.Id [delete: cascade]
+Ref: UserPrivacyExceptions.OwnerUserId > Users.Id [delete: cascade]
+Ref: UserPrivacyExceptions.TargetUserId > Users.Id [delete: cascade]
+Ref: UserRoles.UserId > Users.Id [delete: cascade]
+Ref: UserRoles.RoleId > Roles.Id [delete: cascade]
+Ref: RolePermissions.RoleId > Roles.Id [delete: cascade]
+Ref: RolePermissions.PermissionId > Permissions.Id [delete: cascade]
+
+// Conversation Relationships
+Ref: Conversations.CreatedById > Users.Id [delete: restrict]
+Ref: Conversations.UpdatedById > Users.Id [delete: restrict]
+Ref: ConversationUsers.ConversationId > Conversations.Id [delete: cascade]
+Ref: ConversationUsers.UserId > Users.Id [delete: cascade]
+Ref: ConversationUserAdmins.GrantedByUserId > Users.Id [delete: restrict]
+Ref: ConversationUserBans.ConversationId > Conversations.Id [delete: cascade]
+Ref: ConversationUserBans.UserId > Users.Id [delete: cascade]
+Ref: ConversationUserBans.BannedByUserId > Users.Id [delete: restrict]
+Ref: ConversationUserBans.RevokedByUserId > Users.Id [delete: restrict]
+Ref: ConversationUrls.ConversationId > Conversations.Id [delete: cascade]
+
+// Channel Relationships
+Ref: Channels.CreatorUserId > Users.Id [delete: restrict]
+Ref: ChannelUsers.ChannelId > Channels.Id [delete: cascade]
+Ref: ChannelUsers.UserId > Users.Id [delete: cascade]
+Ref: ChannelUserAdmins.GrantedByUserId > Users.Id [delete: restrict]
+Ref: ChannelUserBans.ChannelId > Channels.Id [delete: cascade]
+Ref: ChannelUserBans.UserId > Users.Id [delete: cascade]
+Ref: ChannelUserBans.BannedByUserId > Users.Id [delete: restrict]
+Ref: ChannelUrls.ChannelId > Channels.Id [delete: cascade]
+Ref: ChannelPinnedMessages.MessageId > Messages.Id [delete: restrict]
+Ref: ChannelPinnedMessages.ChannelId > Channels.Id [delete: cascade]
+Ref: ChannelPinnedMessages.PinnedByUserId > Users.Id [delete: restrict]
+
+// Message Relationships
+Ref: Messages.ConversationId > Conversations.Id [delete: cascade]
+Ref: Messages.ChannelId > Channels.Id [delete: cascade]
+Ref: Messages.ForwardedFromMessageId > Messages.Id [delete: restrict]
+Ref: Messages.SenderId > Users.Id [delete: restrict]
+Ref: Messages.StickerId > Stickers.Id [delete: set null]
+Ref: Messages.GifMediaId > Media.Id [delete: set null]
+Ref: Messages.ThreadId > MessageThreads.Id [delete: restrict]
+Ref: Messages.RepliedMessageId > Messages.Id [delete: restrict]
+Ref: MessageThreads.RootMessageId > Messages.Id [delete: restrict]
+Ref: MessageThreads.LastMessageId > Messages.Id [delete: restrict]
+Ref: MessageAttachments.MessageId > Messages.Id [delete: cascade]
+Ref: MessageAttachments.MediaId > Media.Id [delete: cascade]
+Ref: MessageReactions.MessageId > Messages.Id [delete: cascade]
+Ref: MessageReactions.UserId > Users.Id [delete: cascade]
+Ref: MessageDeletions.MessageId > Messages.Id [delete: cascade]
+Ref: MessageDeletions.UserId > Users.Id [delete: cascade]
+Ref: MessageDeletions.DeletedByUserId > Users.Id [delete: restrict]
+Ref: MessageReads.MessageId > Messages.Id [delete: cascade]
+Ref: MessageReads.UserId > Users.Id [delete: cascade]
+Ref: PinnedMessages.MessageId > Messages.Id [delete: restrict]
+Ref: PinnedMessages.ConversationId > Conversations.Id [delete: cascade]
+Ref: PinnedMessages.PinnedByUserId > Users.Id [delete: restrict]
+Ref: Notifications.UserId > Users.Id [delete: cascade]
+
+// Sticker And GIF Relationships
+Ref: StickerPacks.CoverMediaId > Media.Id [delete: set null]
+Ref: Stickers.StickerPackId > StickerPacks.Id [delete: cascade]
+Ref: Stickers.MediaId > Media.Id [delete: restrict]
+Ref: UserStickerPacks.UserId > Users.Id [delete: cascade]
+Ref: UserStickerPacks.StickerPackId > StickerPacks.Id [delete: cascade]
+Ref: UserRecentStickers.UserId > Users.Id [delete: cascade]
+Ref: UserRecentStickers.StickerId > Stickers.Id [delete: cascade]
+Ref: GifMetadatas.MediaId > Media.Id [delete: cascade]
+Ref: UserRecentGifs.UserId > Users.Id [delete: cascade]
+Ref: UserRecentGifs.MediaId > Media.Id [delete: cascade]
+
+// Media Relationships
+Ref: Media.UploadedByUserId > Users.Id [delete: restrict]
+Ref: Avatars.MediaId > Media.Id [delete: cascade]
+Ref: Avatars.UploadedByUserId > Users.Id [delete: restrict]
+Ref: MediaModerations.MediaId > Media.Id [delete: cascade]
+Ref: MediaModerations.ReviewedById > Users.Id [delete: restrict]
+Ref: SensitiveContentFlags.MediaId > Media.Id [delete: cascade]
+Ref: PostAttachments.PostId > Posts.Id [delete: cascade]
+Ref: PostAttachments.MediaId > Media.Id [delete: cascade]
+
+// Social - Posts Relationships
+Ref: Posts.UserId > Users.Id [delete: cascade]
+Ref: PostLikes.PostId > Posts.Id [delete: cascade]
+Ref: PostLikes.UserId > Users.Id [delete: cascade]
+
+// Social - Stories Relationships
+Ref: Stories.UserId > Users.Id [delete: cascade]
+Ref: Stories.MediaId > Media.Id [delete: cascade]
+Ref: StorySeens.StoryId > Stories.Id [delete: cascade]
+Ref: StorySeens.UserId > Users.Id [delete: cascade]
+
+// Social - Contacts & Blocking Relationships
+Ref: Contacts.UserId > Users.Id [delete: cascade]
+Ref: Contacts.ContactUserId > Users.Id [delete: restrict]
+Ref: BlockedUsers.UserId > Users.Id [delete: cascade]
+Ref: BlockedUsers.BlockedUserId > Users.Id [delete: restrict]

@@ -1,6 +1,6 @@
 # Current Backend Implementation Summary
 
-Last updated: May 2, 2026
+Last updated: May 9, 2026
 
 This document reflects the current .NET backend codebase. The project currently
 contains the domain model, EF Core DbContext configuration, migrations, role and
@@ -40,6 +40,7 @@ messaging are still pending.
 - [x] Dependency injection for `AppDbContext`
 - [x] Authorization policy classes for several conversation/message actions
 - [x] Config-based permission seeding
+- [x] Policy documentation for planned channel actions and privacy-layer checks
 
 ---
 
@@ -53,6 +54,8 @@ messaging are still pending.
 - [ ] Structured logging pipeline
 - [ ] Unit/integration test projects
 - [ ] Admin panel API/UI
+- [ ] Channel action policy classes
+- [ ] Runtime privacy decision service
 
 ---
 
@@ -65,6 +68,8 @@ messaging are still pending.
    - Add request/response DTOs.
    - Add validation and consistent error responses.
    - Wire existing authorization policies into endpoints.
+   - Use the documented channel policies and privacy layer when adding channel
+     and user-data endpoints.
 
 2. **Implement core services**
    - `MessageService`

@@ -16,8 +16,8 @@
 
 - [Messaging Policies](02-policies/messaging-policies.md) - Planned and modeled message rules
 - [Authorization Model](02-policies/authorization-model.md) - RBAC, roles, permissions, and access control
-- [Privacy Policies](02-policies/privacy-policies.md) - User privacy settings and exceptions
-- [Channel Policies](02-policies/channel-policies.md) - Channel rules and governance
+- [Privacy Policies](02-policies/privacy-policies.md) - Planned privacy decision layer, user settings, and exceptions
+- [Channel Policies](02-policies/channel-policies.md) - Planned channel action policies and governance
 
 ### Real-Time Communication
 
@@ -38,6 +38,7 @@ contain controllers or minimal API endpoints.
 ### Database
 
 - [Schema Overview](05-database/schema-overview.md) - Database tables and relationships
+- [DBML Schema Source](05-database/chatapp-schema.dbml) - Current dbdiagram source generated from entities and `AppDbContext`
 - [Migrations Strategy](05-database/migrations-strategy.md) - EF Core migration approach
 - [Indexing Strategy](05-database/indexing-strategy.md) - Performance indexes
 
@@ -69,6 +70,7 @@ contain controllers or minimal API endpoints.
 - Initial migrations
 - Config-based role and permission seeding
 - Authorization policy classes for selected message and conversation actions
+- Policy specifications for channel actions and the user privacy decision layer
 
 ### Pending
 
@@ -92,4 +94,4 @@ contain controllers or minimal API endpoints.
 
 ---
 
-Last updated: May 2, 2026
+Last updated: May 9, 2026

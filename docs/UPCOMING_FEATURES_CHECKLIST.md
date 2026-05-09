@@ -2,7 +2,7 @@
 
 This checklist tracks backend features that are planned or partially built.
 
-Last updated: May 2, 2026
+Last updated: May 9, 2026
 
 ---
 
@@ -13,6 +13,7 @@ Last updated: May 2, 2026
 - [x] GIF metadata mapping and recent GIF mapping
 - [x] Role/permission configuration and seeding
 - [x] Selected authorization policy classes
+- [x] Channel action and privacy-layer policy documentation
 - [ ] API controllers/endpoints
 - [ ] Application services and DTOs
 - [ ] JWT authentication runtime
@@ -34,6 +35,8 @@ Backend tasks:
 - [ ] Add validation
 - [ ] Add global error responses
 - [ ] Wire existing authorization policies into endpoints
+- [ ] Implement channel action policies
+- [ ] Implement reusable privacy decision service
 - [ ] Add pagination patterns
 - [ ] Add integration tests
 

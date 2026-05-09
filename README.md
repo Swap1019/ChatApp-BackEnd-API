@@ -16,6 +16,9 @@ https://github.com/Swap1019/ChatApp-BackEnd
 Database schema:
 https://dbdiagram.io/d/ChatAppDbDesignDotnet-69d77ff70f7c9ef2c0b79147
 
+Versioned DBML source:
+[docs/05-database/chatapp-schema.dbml](docs/05-database/chatapp-schema.dbml)
+
 ---
 
 ## Implemented Backend Foundation
