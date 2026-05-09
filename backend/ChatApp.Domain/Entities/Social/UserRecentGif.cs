@@ -1,5 +1,5 @@
 using ChatApp.Domain.Entities.Identity;
-using ChatApp.Domain.Entities.Media;
+using MediaEntity = ChatApp.Domain.Entities.Media.Media;
 
 namespace ChatApp.Domain.Entities.Social
 {
@@ -9,7 +9,7 @@ namespace ChatApp.Domain.Entities.Social
         public User User { get; set; } = null!;
 
         public Guid MediaId { get; set; }
-        public Media Media { get; set; } = null!;
+        public MediaEntity Media { get; set; } = null!;
 
         // Composite primary key: (UserId, MediaId)
 
