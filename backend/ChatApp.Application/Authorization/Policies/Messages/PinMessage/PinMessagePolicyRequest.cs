@@ -1,9 +1,9 @@
-namespace ChatApp.Application.Authorization.Policies.Message 
+namespace ChatApp.Application.Authorization.Policies.Messages.PinMessage;
+
+public class PinMessagePolicyRequest
 {
-    public class PinMessagePolicyRequest
-    {
-        public Guid UserId { get; set; }
-        public Guid ConversationId { get; set; }
-        public Guid TargetUserId { get; set; }
-    }
+    public Guid UserId { get; set; }
+    public Guid ConversationId { get; set; }
+    public Guid TargetUserId { get; set; }
 }
+

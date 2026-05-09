@@ -1,9 +1,8 @@
-namespace ChatApp.Application.Authorization.Policies.Message 
+namespace ChatApp.Application.Authorization.Policies.Messages.SendMessage;
+
+public class SendMessagePolicyRequest
 {
-    public class SendMessagePolicyRequest
-    {
-        public Guid UserId { get; set; }
-        public Guid TargetUserId { get; set; } // For direct messages, null for group messages
-        public Guid ConversationId { get; set; }
-    }
+    public Guid UserId { get; set; }
+    public Guid TargetUserId { get; set; } // For direct messages, null for group messages
+    public Guid ConversationId { get; set; }
 }

@@ -1,4 +1,4 @@
-using ChatApp.Application.Authorization.Queries.Conversation.RemoveAdminRole;
+using ChatApp.Application.Authorization.Queries.Conversations.RemoveAdminRole;
 
 namespace ChatApp.Application.Authorization.Rules.Conversations;
 
@@ -15,17 +15,11 @@ public sealed class RemoveAdminRoleRules
         if (data.Conversation.IsDeleted)
             return "Conversation is deleted";
 
-        if (!data.IsActorActive)
-            return "Actor is not allowed to perform this action";
-
         if (!data.IsActorMember)
             return "You are not a member of this conversation";
 
         if (!data.IsTargetMember)
             return "Target user is not a member of this conversation";
-
-        if (data.IsConversationBanned)
-            return "You are banned from this conversation";
 
         if (data.IsTargetOwner)
             return "You cannot remove admin role from the conversation owner";

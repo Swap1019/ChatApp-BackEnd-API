@@ -1,6 +1,7 @@
 using ChatApp.Application.Abstractions.Persistence;
 using ChatApp.Application.Abstractions.Time;
-using ChatApp.Application.Authorization.Policies.Message;
+using ChatApp.Application.Authorization.Policies.Messages;
+using ChatApp.Application.Authorization.Policies.Messages.PinMessage;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Application.Authorization.Queries.Messages.PinMessage
@@ -37,7 +38,6 @@ namespace ChatApp.Application.Authorization.Queries.Messages.PinMessage
                 .FirstOrDefaultAsync(cancellationToken);
 
             var isActorMember = false;
-            var isActorBanned = false;
             var isActorAdmin = false;
             var isBlockedBySender = false;
             var isBlockedByTarget = false;
@@ -49,17 +49,8 @@ namespace ChatApp.Application.Authorization.Queries.Messages.PinMessage
                     cu.UserId == request.UserId,
                     cancellationToken);
 
-            if (conversation != null && conversation.IsGroup && !conversation.IsDeleted && user != null && !user.IsBanned && !user.IsSuspended)
+            if (conversation != null && conversation.IsGroup && !conversation.IsDeleted && user != null)
             {
-                isActorBanned = await _context.ConversationUserBans
-                    .IgnoreQueryFilters()
-                    .AnyAsync(b =>
-                        b.ConversationId == request.ConversationId &&
-                        b.UserId == request.UserId &&
-                        !b.IsRevoked &&
-                        (b.ExpiresAt == null || b.ExpiresAt > _clock.UtcNow),
-                        cancellationToken);
-
                 var admin = await _context.ConversationUserAdmins
                     .Where(a =>
                         a.ConversationUser.ConversationId == request.ConversationId &&
@@ -72,7 +63,7 @@ namespace ChatApp.Application.Authorization.Queries.Messages.PinMessage
                 canPinMessages = admin?.CanPinMessages ?? false;
             }
 
-            if (conversation != null && !conversation.IsGroup && !conversation.IsDeleted && user != null && !user.IsBanned && !user.IsSuspended)
+            if (conversation != null && !conversation.IsGroup && !conversation.IsDeleted && user != null)
                 {
                     isBlockedBySender = await _context.BlockedUsers
                         .AnyAsync(b =>
@@ -91,7 +82,6 @@ namespace ChatApp.Application.Authorization.Queries.Messages.PinMessage
                 user,
                 conversation,
                 isActorMember,
-                isActorBanned,
                 isActorAdmin,
                 isBlockedBySender,
                 isBlockedByTarget,

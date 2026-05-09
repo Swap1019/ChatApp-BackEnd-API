@@ -1,6 +1,7 @@
 using ChatApp.Application.Abstractions.Persistence;
 using ChatApp.Application.Abstractions.Time;
-using ChatApp.Application.Authorization.Policies.Message;
+using ChatApp.Application.Authorization.Policies.Messages;
+using ChatApp.Application.Authorization.Policies.Messages.SendMessage;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Application.Authorization.Queries.Messages.SendMessage

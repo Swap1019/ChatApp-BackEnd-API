@@ -1,30 +1,28 @@
 using ChatApp.Application.Authorization.Common;
 using ChatApp.Application.Authorization.Rules.Conversations;
-using ChatApp.Application.Authorization.Queries.Conversation.DeleteConversation;
+using ChatApp.Application.Authorization.Queries.Conversations.DeleteConversation;
 
-namespace ChatApp.Application.Authorization.Policies.Conversation
+namespace ChatApp.Application.Authorization.Policies.Conversations.DeleteConversation;
+
+public class DeleteConversationPolicy : IPolicy<DeleteConversationPolicyRequest>
 {
-    public class DeleteConversationPolicy : IPolicy<DeleteConversationPolicyRequest>
+    private readonly DeleteConversationAuthorizationQuery _authorizationQuery;
+    private readonly DeleteConversationRules _rules;
+
+    public DeleteConversationPolicy(DeleteConversationAuthorizationQuery authorizationQuery, DeleteConversationRules rules)
     {
-        private readonly DeleteConversationAuthorizationQuery _authorizationQuery;
-        private readonly DeleteConversationRules _rules;
+        _authorizationQuery = authorizationQuery;
+        _rules = rules;
+    }
 
-        public DeleteConversationPolicy(DeleteConversationAuthorizationQuery authorizationQuery, DeleteConversationRules rules)
-        {
-            _authorizationQuery = authorizationQuery;
-            _rules = rules;
-        }
+    public async Task<PolicyResult> EvaluateAsync(DeleteConversationPolicyRequest request, CancellationToken cancellationToken = default)
+    {
+        var data = await _authorizationQuery.ExecuteAsync(request, cancellationToken);
+        var failureReason = _rules.GetFailureReason(data);
 
-        public async Task<PolicyResult> EvaluateAsync(DeleteConversationPolicyRequest request, CancellationToken cancellationToken = default)
-        {
-            var data = await _authorizationQuery.ExecuteAsync(request, cancellationToken);
-            var failureReason = _rules.GetFailureReason(data);
+        if (failureReason != null)
+            return PolicyResult.Deny(failureReason);
 
-            if (failureReason != null)
-                return PolicyResult.Deny(failureReason);
-
-            return PolicyResult.Allow();
-        }
-    
+        return PolicyResult.Allow();
     }
 }

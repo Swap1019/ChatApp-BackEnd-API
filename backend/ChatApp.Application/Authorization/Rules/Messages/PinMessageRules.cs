@@ -9,9 +9,6 @@ public sealed class PinMessageRules
         if (data.User == null)
             return "User not found";
 
-        if (data.User.IsBanned || data.User.IsSuspended)
-            return "User is not allowed to perform this action";
-
         if (data.Conversation == null)
             return "Conversation not found";
 
@@ -23,9 +20,6 @@ public sealed class PinMessageRules
         
         if (data.Conversation.IsGroup)
         {
-            if (data.IsActorBanned)
-                return "User is banned from this conversation";
-
             if (data.Conversation.CreatedById != data.User.Id &&
                 (!data.IsActorAdmin || !data.CanPinMessages))
             {

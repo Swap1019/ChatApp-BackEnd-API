@@ -4,7 +4,6 @@ namespace ChatApp.Application.Authorization.Queries.Messages.PinMessage
         UserSnapshot? User,
         ConversationSnapshot? Conversation,
         bool IsActorMember,
-        bool IsActorBanned,
         bool IsActorAdmin,
         bool IsBlockedBySender,
         bool IsBlockedByTarget,

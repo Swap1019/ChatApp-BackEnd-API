@@ -1,9 +1,9 @@
-namespace ChatApp.Application.Authorization.Policies.Conversation 
+namespace ChatApp.Application.Authorization.Policies.Conversations.BanUser;
+
+public class BanUserPolicyRequest
 {
-    public class BanUserPolicyRequest
-    {
-        public Guid ActorId { get; set; }
-        public Guid TargetUserId { get; set; }
-        public Guid ConversationId { get; set; }
-    }
+    public Guid ActorId { get; set; }
+    public Guid TargetUserId { get; set; }
+    public Guid ConversationId { get; set; }
+
 }
