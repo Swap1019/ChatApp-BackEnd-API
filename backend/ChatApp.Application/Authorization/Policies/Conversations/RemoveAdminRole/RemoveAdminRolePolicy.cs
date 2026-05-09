@@ -1,5 +1,5 @@
 using ChatApp.Application.Authorization.Common;
-using ChatApp.Application.Authorization.Queries.Conversation.RemoveAdminRole;
+using ChatApp.Application.Authorization.Queries.Conversations.RemoveAdminRole;
 using ChatApp.Application.Authorization.Rules.Conversations;
 
 namespace ChatApp.Application.Authorization.Policies.Conversations.RemoveAdminRole;
