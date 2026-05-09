@@ -438,6 +438,80 @@ namespace ChatApp.Infrastructure.Persistence
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
+            // ===================== STICKER PACK =====================
+            modelBuilder.Entity<StickerPack>(entity =>
+            {
+                entity.HasKey(sp => sp.Id);
+
+                entity.HasIndex(sp => sp.IsActive);
+                entity.HasIndex(sp => sp.IsOfficial);
+
+                entity.HasOne(sp => sp.CoverMedia)
+                    .WithMany()
+                    .HasForeignKey(sp => sp.CoverMediaId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // ===================== STICKER =====================
+            modelBuilder.Entity<Sticker>(entity =>
+            {
+                entity.HasKey(s => s.Id);
+
+                entity.HasIndex(s => s.StickerPackId);
+                entity.HasIndex(s => s.MediaId);
+                entity.HasIndex(s => new { s.StickerPackId, s.Order }).IsUnique();
+
+                entity.HasOne(s => s.StickerPack)
+                    .WithMany(sp => sp.Stickers)
+                    .HasForeignKey(s => s.StickerPackId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(s => s.Media)
+                    .WithMany()
+                    .HasForeignKey(s => s.MediaId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ===================== USER STICKER PACK =====================
+            modelBuilder.Entity<UserStickerPack>(entity =>
+            {
+                entity.HasKey(usp => new { usp.UserId, usp.StickerPackId });
+
+                entity.HasIndex(usp => usp.UserId);
+                entity.HasIndex(usp => usp.StickerPackId);
+                entity.HasIndex(usp => usp.AddedAt);
+
+                entity.HasOne(usp => usp.User)
+                    .WithMany()
+                    .HasForeignKey(usp => usp.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(usp => usp.StickerPack)
+                    .WithMany()
+                    .HasForeignKey(usp => usp.StickerPackId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ===================== USER RECENT STICKER =====================
+            modelBuilder.Entity<UserRecentSticker>(entity =>
+            {
+                entity.HasKey(urs => new { urs.UserId, urs.StickerId });
+
+                entity.HasIndex(urs => urs.UserId);
+                entity.HasIndex(urs => urs.StickerId);
+                entity.HasIndex(urs => urs.LastUsedAt).IsDescending();
+
+                entity.HasOne(urs => urs.User)
+                    .WithMany()
+                    .HasForeignKey(urs => urs.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(urs => urs.Sticker)
+                    .WithMany()
+                    .HasForeignKey(urs => urs.StickerId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
             // ===================== CONTACT =====================
             modelBuilder.Entity<Contact>(entity =>
             {
